@@ -141,3 +141,225 @@ void PlacementBoat()
 
 
 
+//fonction permettant à l'ordi de placer ses bateaux aléatoirement
+void PlacementBoatEnemy()
+{
+	srand(time(NULL));			// Permet d'avoir une génération différente pour le placement des bateaux adverse sur plusieurs partie
+    int i = 0;
+	while(i<+6)
+    {
+		int RndX,RndY;
+		RndX = 1+rand()%9;		// Pour que l'ordi ne choisissent pas de prendre une valeur supérieur à 9
+		RndY = 1+rand()%9;		// On doit ajouter '+1' au résultat pour que 9 soit compris. (Avant c'était les valeurs entre 0 et 8, maintenant ça sera des valeurs compris entre 1 et 9)
+
+
+		if (ennemie_seamap[RndX][RndY] != 1)
+        {
+			ennemie_seamap[RndX][RndY]=1;
+			i++;
+		}
+	}
+}
+
+
+//=========================================================================
+
+
+//fonction permettant d'afficher la map sur laquel le joueur à tiré
+void affichage_Tire()
+{
+	for(int il=-1;il<10;il++)
+        {
+		if (il == -1)
+		{
+			printf("  ");
+		} else
+		{
+			printf("%d ",il);
+		}
+
+	for(int ic=0;ic<10;ic++)
+        {
+		if (il == -1)
+		{
+				printf(" %d ",ic);
+		} else
+		{
+
+			switch(seamap[il][ic]){
+				case Coule:
+					printf(" X "); // Affiche les bateaux détruit
+					break;
+				case Plouf:
+					printf(" o "); // Affiche les tires qui n'ont pas touché de bateau
+					break;
+			  	default:
+			  		printf(" ~ "); // Si ni l'un si l'autre
+			  		break;
+				}
+			}
+		}
+		printf("\n");
+	}
+}
+
+
+
+//=========================================================================
+
+
+//fonction permettant d'afficher la map de l'ennemie pour finir le programme vite
+void Affi_seamapEnemy() {
+printf("===MAP ENNEMIE===\n\n");
+printf("    0  1  2  3  4  5  6  7  8  9 \n");
+int CELL;
+    for(int il=0;il<lignMax;il++)
+        {
+            printf(" %d ",il);
+            for( int ic=0;ic<ColMax;ic++)
+            {
+                CELL=ennemie_seamap[il][ic];
+                switch(CELL)
+                {
+                case Libre :
+                	printf(" ~ ");
+                    break;
+                case Boat :
+                	printf(" B ");
+                    break;
+                case Plouf :
+                	printf(" O ");
+                    break;
+                case Coule :
+                	printf(" X ");
+                    break;
+                }
+            }
+            printf("\n");
+        }
+}
+
+
+//=========================================================================
+
+
+//fonction permettant à l'ennemie de tirer aléatoirement
+void ShotEnemy()
+{
+
+	if (EtatJeux == 1)			// Si il est égale à 1 c'est que tout les bateaux d'une équipe ne sont pas détruit
+    {
+		printf("=====L'ENNEMIE TIRE====\n\n");
+	    srand(time(NULL));
+	    ShotEnemyX=rand()%9;
+	    ShotEnemyY=rand()%9;
+	    if (seamap[ShotEnemyX][ShotEnemyY]==Boat)
+	    {
+	        seamap[ShotEnemyX][ShotEnemyY]=Coule;
+	        Boat_life--;		// Puis ce que l'ordinateur indique les coordonnés d'un bateau, on soustrait 1 au compteur de bateau vivant de l'utilisateur pour que dans le cas qu'il n'ait plus de bateau, un message lui indiquant qu'il a perdu soit affiché.
+	        boatDestroy++;  	// On incrémente le nombre de bateau détruit.
+	        // Es ce que j'aurai pu faire 'boatDestroy -= -1;' ???
+	        printf("GLOUGLOU, navire coule\n");
+	    }
+	    else if (seamap[ShotEnemyX][ShotEnemyY]==Coule);
+	    else seamap[ShotEnemyX][ShotEnemyY]=Plouf;
+	    {
+	        printf("PLOUF\n");
+        }
+        printf("%d %d",ShotEnemyX,ShotEnemyY);
+	}
+	VerifFinDeJeu();
+}
+
+
+//=========================================================================
+
+
+//fonction permettant de tirer sur l'ennemie
+void Shot()
+{
+	VerifFinDeJeu();
+	printf("=====TIRER SUR L'ENNEMIE====\n\n");
+    printf("entrez la coordonnee ligne de tire = ");
+    scanf("%d",&ShotX);
+if (ShotX>=0 && ShotX<=9)
+    {
+	    printf("bon\n");
+	    printf("entrez la coordonne colonne de tire =");
+	    scanf("%d",&ShotY);
+	    if (ShotY>=0 && ShotY<=9)
+	    {
+        	printf("bon\n");
+       		if (ennemie_seamap[ShotX][ShotY]==Boat)
+       	 	{
+	            ennemie_seamap[ShotX][ShotY]=Coule;
+	            boatLifeEnemy--;
+	            boatDestroyEnemy=boatDestroyEnemy+1;
+	            printf("GLOUGLOU, navire coule\n");
+        	}
+            else if (ennemie_seamap[ShotX][ShotY]==Coule);
+            else ennemie_seamap[ShotX][ShotY]=Plouf;
+            {
+                printf("PLOUF\n");
+            }
+        }
+    }
+}
+
+
+//=========================================================================
+
+
+//fonction permettant d'afficher le menu et d'y faire différent choix
+void menu() {
+	do
+	{
+	printf("\n================ M E N U ================");
+	printf("\n0 -- Quitter le jeux\n");
+	printf("\n1 -- Tire : entrer les coordonnees Li et Ci");
+	printf("\n2 -- Affichage de la matrice de tire");
+	printf("\n3 -- Affichage de l'etat de la flotte");
+	printf("\n4 -- Affichage SEAMAP!");
+	printf("\n5 -- Affichage map ennemie");
+	printf("\n faite votre choix : ");
+	scanf("%d",&choix);
+
+}while(!(choix == 0 || choix == 1 || choix == 2 || choix == 3 || choix == 4 || choix == 5)); // <-- Coup de génie pour obligé l'utilisateur à rentré une valeur correspondant à un choix mais s'il saisit une chaine de caractère le programme bug...
+	
+	switch(choix)
+	{
+		case (1):
+			Shot();
+			ShotEnemy();
+			NbTour++;
+			break;
+		case (2):
+			printf("\nVous avez choisi d'afficher la matrice de Tire\n\n");
+			affichage_Tire();
+			break;
+		case (3):
+			printf("ETAT_Flotte");
+			Affi_Flotte();
+			break;
+		case (4):
+			printf("\nVous avez choisi d'Afficher la SEAMAP\n\n");
+			affichage_seamap();
+			break;
+		case (5):
+			Affi_seamapEnemy();
+			break;
+		case (0):
+			printf("END");
+			EtatJeux = 0;
+			VerifFinDeJeu();
+			break;
+			VerifFinDeJeu();
+	}
+	printf("\n ");
+}
+
+//=========================================================================
+
+
+
+
